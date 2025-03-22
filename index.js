@@ -1,3 +1,4 @@
+import http from 'http';
 import pkg from 'pg';
 const { Client } = pkg;
 
@@ -60,6 +61,29 @@ async function insertLogData(start, end) {
   }
 }
 
-insertLogData(2025, 2025);
-insertLogData(2024, 2024);
-insertLogData(2023, 2023);
+
+
+// client.connect();
+
+const server = http.createServer(async (req, res) => {
+  if (req.method === 'GET' && req.url === '/insert-log') {
+    try {
+      insertLogData(2025, 2025);
+      insertLogData(2024, 2024);
+      insertLogData(2023, 2023);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Log inserted successfully' }));
+    } catch (error) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: error.message }));
+    }
+  } else {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Not Found' }));
+  }
+});
+
+server.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+
